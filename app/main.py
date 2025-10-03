@@ -10,6 +10,7 @@ from app.summary import summarize_and_translate
 from app.translation import translate, Hebrew, English
 
 
+
 #Optional sets value to default unless user inputs
 class chatRequest(BaseModel):
     prompt: str
@@ -17,6 +18,9 @@ class chatRequest(BaseModel):
     top_k: Optional[int] = 40
     top_p: Optional[float] = 0.7
     max_tokens: Optional[int] = 500
+
+
+
 
 
 
@@ -68,7 +72,6 @@ async def summarize_endpoint(request: chatRequest):
     return StreamingResponse(event_stream(),media_type = "text/plain")
 
 
-
 @app.post("/summarize_english")
 async def summarize_english_endpoint(request: chatRequest):
     hebrew_text = request.prompt
@@ -82,4 +85,5 @@ async def summarize_english_endpoint(request: chatRequest):
             yield chunk 
 
     return StreamingResponse(event_stream(),media_type="text/plain")
+
 

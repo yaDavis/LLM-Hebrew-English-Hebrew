@@ -6,6 +6,7 @@ client = Client(host ="http://localhost:11434")
 
 system_prompt = "You are a proffessional text summarizer. Summarize as simply as possible and by 5 conise bullet points." \
 "each bullet point starts with - and ends with a new line"
+"REMEMBER ONLY 5 BULLET POINTS NO MORE NO LESS"
 
 #I call it ph3mini and not phi3:mini-4k-instruct because i have created a new custom model via gguf file of phi3:mini... in ollama
 #and now if i want to use that model i have to use the custom name i called phi3mini
@@ -30,6 +31,8 @@ def summarize(prompt: str, options: dict):
             yield chunk["message"]["content"]
 
 
+
+
 def summarize_and_translate(text: str, options: dict):
     
     #buffer of bulletpoints
@@ -45,4 +48,5 @@ def summarize_and_translate(text: str, options: dict):
             buffer = buffer[line_end:]  #continue with the next bullet point
             if line: #if we have a bullet point
                 yield translate(line,English,Hebrew) #yield the translated bullet point from english to hebrew
+
 
