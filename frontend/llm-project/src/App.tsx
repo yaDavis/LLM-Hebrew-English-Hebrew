@@ -1,35 +1,56 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react";
+import "./App.css";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [prompt, setPrompt] = useState("");
+  const [summary, setSummary] = useState("");
+  const handleSummarize = async () => {
+    setSummary("");
+    const response = await fetch("http://localhost:8000/summarize", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ prompt }),
+    });
 
+    if (!response.body) {
+      const text = await response.text();
+      setSummary(text);
+      return;
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder("utf-8");
+    let done = false;
+    while (!done) {
+      const { value, done: doneReading } = await reader.read();
+      done = doneReading;
+      if (value) {
+        const chunk = decoder.decode(value, { stream: true });
+        setSummary((prev) => prev + chunk);
+      }
+    }
+  };
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
+    <div className="app-container">
+      <h1>Hebrew Text Summarizer</h1>
+      <div className="input-container">
+        <textarea
+          className="prompt-input"
+          rows={10}
+          cols={50}
+          placeholder="Enter your prompt"
+          value={prompt}
+          onChange={(e) => setPrompt(e.target.value)}
+        />
+        <button className="summarize-button" onClick={handleSummarize}>
+          Summarize
         </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+      <div className="summary-output">{summary}</div>
+    </div>
+  );
 }
 
-export default App
+export default App;
