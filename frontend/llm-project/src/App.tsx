@@ -3,6 +3,10 @@ import "./App.css";
 
 function App() {
   const [prompt, setPrompt] = useState("");
+  const [temperature, setTemperature] = useState('0.7');
+  const [topP, setTopP] = useState('0.9');
+  const [topK, setTopK] = useState('40');
+  const [maxTokens, setMaxTokens] = useState('256');
   const [summary, setSummary] = useState("");
   const handleSummarize = async () => {
     setSummary("");
@@ -11,7 +15,7 @@ function App() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ prompt }),
+      body: JSON.stringify({ prompt, temperature, top_p: topP, top_k: topK, max_tokens: maxTokens }),
     });
 
     if (!response.body) {
@@ -35,6 +39,22 @@ function App() {
   return (
     <div className="app-container">
       <h1>Hebrew Text Summarizer</h1>
+      <div className="config-container">
+        <div>
+        <label htmlFor="">Temperature</label>
+        <input type="text" value={temperature} onChange={(e) => setTemperature(e.target.value)}/>
+        </div>
+        <div>
+        <label htmlFor="">Top P</label>
+        <input type="text" value={topP} onChange={(e) => setTopP(e.target.value)}/>
+        </div>
+        <div>
+        <label htmlFor="">Top K</label>
+        <input type="text" value={topK} onChange={(e) => setTopK(e.target.value)}/>
+        </div>
+        <div><label htmlFor="">Max tokens</label>
+        <input type="text" value={maxTokens} onChange={(e) => setMaxTokens(e.target.value)} />
+      </div></div>
       <div className="input-container">
         <textarea
           className="prompt-input"
@@ -48,7 +68,11 @@ function App() {
           Summarize
         </button>
       </div>
-      <div className="summary-output">{summary}</div>
+      <div className="summary-output">
+        {summary && summary.split("-").map((line, index) => (
+          <div key={index}>{line}</div>
+        ))}
+      </div>
     </div>
   );
 }
